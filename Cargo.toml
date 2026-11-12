@@ -1,13 +1,13 @@
 [package]
 name = "tao"
-version = "0.36.0"
+version = "0.37.1"
 description = "Cross-platform window manager library."
 authors = [
   "Tauri Programme within The Commons Conservancy",
   "The winit contributors",
 ]
 edition = "2021"
-rust-version = "1.74"
+rust-version = "1.85"
 keywords = ["windowing"]
 license = "Apache-2.0"
 readme = "README.md"
@@ -42,7 +42,6 @@ members = ["tao-macros"]
 [dependencies]
 libc = "0.2"
 log = "0.4"
-once_cell = "1"
 serde = { version = "1", optional = true, features = ["serde_derive"] }
 rwh_04 = { package = "raw-window-handle", version = "0.4", optional = true }
 rwh_05 = { package = "raw-window-handle", version = "0.5", features = [
@@ -67,10 +66,10 @@ softbuffer = "0.4"
 parking_lot = "0.12"
 unicode-segmentation = "1.11"
 windows-version = "0.1"
-windows-core = "0.61"
+windows-core = "0.62"
 
 [target."cfg(target_os = \"windows\")".dependencies.windows]
-version = "0.61"
+version = "0.62"
 features = [
   "Win32_Devices_HumanInterfaceDevice",
   "Win32_Foundation",
@@ -110,8 +109,8 @@ percent-encoding = "2.3"
 tao-macros = { version = "0.1.4", path = "./tao-macros" }
 
 [target."cfg(target_env = \"ohos\")".dependencies]
-openharmony-ability = { git = "https://github.com/harmony-contrib/openharmony-ability.git" }
-openharmony-ability-derive = { git = "https://github.com/harmony-contrib/openharmony-ability.git" }
+openharmony-ability = { git = "https://github.com/LeenHawk/openharmony-ability.git", rev = "c5f0a450f7bbfedc52160f2fbeaa04886e0eb34b" }
+openharmony-ability-derive = { git = "https://github.com/LeenHawk/openharmony-ability.git", rev = "c5f0a450f7bbfedc52160f2fbeaa04886e0eb34b" }
 
 [target."cfg(any(target_os = \"ios\", target_os = \"macos\"))".dependencies]
 objc2 = "0.6"

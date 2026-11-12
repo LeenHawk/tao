@@ -15,12 +15,11 @@ use ndk::{
   configuration::Configuration,
   looper::{ForeignLooper, Poll, ThreadLooper},
 };
-use once_cell::sync::Lazy;
 use std::{
   collections::{HashSet, VecDeque},
   error::Error,
   fmt,
-  sync::RwLock,
+  sync::{LazyLock, RwLock},
   time::{Duration, Instant},
 };
 
@@ -123,7 +122,8 @@ macro_rules! jni_call_method {
 pub mod ndk_glue;
 use ndk_glue::{ActivityId, Event, Rect, WindowEvent};
 
-static CONFIG: Lazy<RwLock<Configuration>> = Lazy::new(|| RwLock::new(Configuration::new()));
+static CONFIG: LazyLock<RwLock<Configuration>> =
+  LazyLock::new(|| RwLock::new(Configuration::new()));
 
 #[derive(Debug)]
 pub enum OsError {
@@ -424,12 +424,16 @@ impl<T: 'static> EventLoop<T> {
             }
           */
         }
-        Some(EventSource::User) => {
-          while let Ok(event) = self.receiver.try_recv() {
-            self.call_event_handler(event_handler, control_flow, event::Event::UserEvent(event));
-          }
-        }
-        None => {}
+        _ => {}
+      }
+
+      // We need to treat every event as if they were from [`EventLoopProxy::send_event`]
+      //
+      // > All return values may also imply ALOOPER_POLL_WAKE. If you call this in a loop,
+      // > you must treat all return values as if they also indicated ALOOPER_POLL_WAKE.
+      // > https://developer.android.com/ndk/reference/group/looper#alooper_pollonce
+      while let Ok(event) = self.receiver.try_recv() {
+        self.call_event_handler(event_handler, control_flow, event::Event::UserEvent(event));
       }
 
       self.call_event_handler(event_handler, control_flow, event::Event::MainEventsCleared);
